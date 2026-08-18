@@ -21,14 +21,22 @@ class CollectResults:
             return pd.DataFrame()    
                       
         session._load_drivers_results()
-        
         df = session.results
-        df["mode"] = mode 
         
+        # PEGANDO DADOS DO EVENTO
+        df["year"] = session.date.year
+        df["Date"] = session.date
+        df["mode"] = session.name
+        df["RoundNumber"] = session.event["RoundNumber"]
+        df["OfficialEventName"] = session.event["OfficialEventName"]
+        df["EventName"] = session.event["EventName"]
+        df["Country"] = session.event["Country"]
+        df["Location"] = session.event["Location"]
         return df
 
-    def save_data(self, df, year, gp, mode):
-        df.to_parquet(f"data/{year}_{gp:02}_{mode}.parquet")
+    def save_data(self, df:pd.DataFrame, year:int, gp:int , mode:str):
+        filename =  f"data/{year}_{gp:02}_{mode}.parquet"
+        df.to_parquet(filename, index=False)
 
 
     def process(self, year, gp, mode  ):
@@ -59,11 +67,29 @@ if __name__ == "__main__":
 
 
     parser = argparse.ArgumentParser()
+    parser.add_argument("--start", type=int, default=0)
+    parser.add_argument("--stop", type=int, default=0)
     parser.add_argument("--years","-y", nargs="+", type=int)
     parser.add_argument("--modes","-m", nargs="+")
     
     args = parser.parse_args() 
+
     
-    collect = CollectResults(args.years,args.modes)
+    if args.years:
+        collect = CollectResults(args.years,args.modes)
+        
+    elif args.start and args.stop:
+        years = [i for i in range(args.start, args.stop+1)]
+        collect = CollectResults(years,args.modes)
     collect.process_year()
 
+
+# %%
+
+df = pd.read_parquet("data/2019_02_R.parquet")
+df 
+# %%
+
+fastf1.Cache.clear_cache()
+
+# %%
