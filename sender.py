@@ -63,9 +63,6 @@ parser.add_argument("--bucket_path", type=str, default="f1/results")
 parser.add_argument("--folder","-y", type=str, default="data")
 args= parser.parse_args()
 
-# send = sender(args."buchakovga-468737624561-us-east-2-an","f1/results")
-# send.process_folder("data")
-
 if args.bucket:
     send = sender(args.bucket, args.bucket_path)
     send.process_folder(args.folder)
