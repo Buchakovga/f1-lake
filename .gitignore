@@ -3,3 +3,6 @@
 *.parquet
 
 .env
+
+__pycache__
+

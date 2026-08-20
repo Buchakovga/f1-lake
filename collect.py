@@ -83,13 +83,3 @@ if __name__ == "__main__":
         collect = CollectResults(years,args.modes)
     collect.process_year()
 
-
-# %%
-
-df = pd.read_parquet("data/2019_02_R.parquet")
-df 
-# %%
-
-fastf1.Cache.clear_cache()
-
-# %%
