@@ -1,11 +1,10 @@
 with todas_corte_data as (
-    SELECT 
-        * 
-        FROM f1_results
-        
+    SELECT * 
+        FROM `buchakovga_bronze`.`v2_f1_results`
         where 
-            date(date) <= date('{date}')
-), pilotos_ult_2_anos as (        
+            date(date) <= date('2024-04-21')
+            
+) , pilotos_ult_2_anos as (        
     select distinct 
         driverid
     from 
@@ -16,13 +15,27 @@ with todas_corte_data as (
                     from 
                 todas_corte_data
         )
-), tb_results as  (
+), tb_distinct_round as (
+        select distinct year, roundnumber from todas_corte_data
+), tb_rn as (
+select 
+        *,
+        row_number()  over (order by year desc, roundnumber desc ) as rn
+from
+        tb_distinct_round
+) , tb_results as  (
     select 
         a.* 
     from  todas_corte_data a 
 
     inner join pilotos_ult_2_anos b 
         on a.driverid = b.driverid
+
+    inner join tb_rn c 
+        on a.year = c.year and 
+           a.roundnumber = c.roundnumber
+    where 
+        c.rn <= 10
 
 ) , tb_features_piloto as (
         select 
@@ -92,12 +105,12 @@ with todas_corte_data as (
         from tb_results
         group by driverid
 
-) 
+)
 
 select 
-      date('{date}')  as dtref,
+      date('2024-04-21')  as dtref,
       *
  from 
         tb_features_piloto
-        
+order by driverid
 
